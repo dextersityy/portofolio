@@ -1,403 +1,451 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Menu, 
-  X, 
-  Github, 
-  Linkedin, 
-  Twitter, 
-  Mail, 
-  Cpu, 
-  Zap, 
-  Brain, 
-  ArrowRight, 
-  ExternalLink, 
-  Code2,
-  ChevronDown
-} from 'lucide-react';
-
-// --- Components ---
-
-const SectionHeading = ({ number, title }) => (
-  <div className="flex items-center mb-8 w-full">
-    <span className="text-[#64FFDA] font-mono text-xl mr-2">{number}.</span>
-    <h2 className="text-2xl md:text-3xl font-bold text-[#CCD6F6] whitespace-nowrap">
-      {title}
-    </h2>
-    <div className="h-[1px] bg-[#233554] w-full ml-4 md:w-[300px]"></div>
-  </div>
-);
-
-const Button = ({ children, primary, href, onClick, className = "" }) => {
-  const baseClasses = "px-6 py-3 rounded font-mono text-sm transition-all duration-300 ease-in-out border";
-  const primaryClasses = "border-[#64FFDA] text-[#64FFDA] hover:bg-[#64FFDA]/10";
-  const secondaryClasses = "border-transparent text-[#CCD6F6] hover:text-[#64FFDA]";
-
-  const Component = href ? 'a' : 'button';
-  
-  return (
-    <Component 
-      href={href} 
-      onClick={onClick}
-      className={`${baseClasses} ${primary ? primaryClasses : secondaryClasses} ${className}`}
-    >
-      {children}
-    </Component>
-  );
-};
-
-// --- Main App Component ---
-
-export default function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Fade-in effect on mount
-  useEffect(() => {
-    setIsVisible(true);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rppy - AI Solutions Architect</title>
     
-    // Scroll spy for active section
-    const handleScroll = () => {
-      const sections = ['hero', 'about', 'services', 'work', 'contact'];
-      const scrollPosition = window.scrollY + 100;
+    <!-- React & ReactDOM (Production) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel (untuk memproses JSX di browser) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Noto Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element && element.offsetTop <= scrollPosition && (element.offsetTop + element.offsetHeight) > scrollPosition) {
-          setActiveSection(section);
-        }
-      }
-    };
+    <style>
+        body { font-family: 'Noto Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .writing-vertical { writing-mode: vertical-rl; }
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-[#0A192F] text-[#8892b0]">
+    <div id="root"></div>
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  const navLinks = [
-    { name: 'About', href: '#about', number: '01' },
-    { name: 'Services', href: '#services', number: '02' },
-    { name: 'Work', href: '#work', number: '03' },
-    { name: 'Contact', href: '#contact', number: '04' },
-  ];
+        // --- Icons (Inline SVG replacement for Lucide) ---
+        // Menggunakan SVG langsung agar tidak perlu install package icon
+        const Icon = ({ path, size = 24, className = "" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                {path}
+            </svg>
+        );
 
-  const services = [
-    {
-      title: "AI Implementation",
-      icon: <Brain size={32} />,
-      description: "Integrating State-of-the-Art LLMs and machine learning models into existing business applications to enhance intelligence and capability."
-    },
-    {
-      title: "Workflow Automation",
-      icon: <Zap size={32} />,
-      description: "Streamlining repetitive business processes using Python scripts, n8n, or custom API integrations to save time and reduce error."
-    },
-    {
-      title: "Technical Consulting",
-      icon: <Code2 size={32} />,
-      description: "Helping stakeholders navigate the AI landscape, selecting the right tech stack, and architecting scalable solutions."
-    }
-  ];
+        const Menu = (props) => <Icon {...props} path={<><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></>} />;
+        const X = (props) => <Icon {...props} path={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>} />;
+        const Github = (props) => <Icon {...props} path={<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>} />;
+        const Linkedin = (props) => <Icon {...props} path={<><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></>} />;
+        const Twitter = (props) => <Icon {...props} path={<path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>} />;
+        const Mail = (props) => <Icon {...props} path={<><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></>} />;
+        const Cpu = (props) => <Icon {...props} path={<><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></>} />;
+        const Zap = (props) => <Icon {...props} path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>} />;
+        const Brain = (props) => <Icon {...props} path={<><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></>} />;
+        const ArrowRight = (props) => <Icon {...props} path={<><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>} />;
+        const ExternalLink = (props) => <Icon {...props} path={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></>} />;
+        const Code2 = (props) => <Icon {...props} path={<><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>} />;
+        const ChevronDown = (props) => <Icon {...props} path={<polyline points="6 9 12 15 18 9"/>} />;
 
-  const projects = [
-    {
-      title: "Customer Support AI Agent",
-      description: "A context-aware chatbot capable of handling 80% of level-1 support queries. Integrated with Zendesk and trained on company documentation.",
-      tech: ["OpenAI API", "Python", "Vector DB", "React"],
-      link: "#"
-    },
-    {
-      title: "Predictive Sales Dashboard",
-      description: "A real-time dashboard visualizing sales trends and forecasting future revenue using historical data models.",
-      tech: ["TensorFlow", "Next.js", "D3.js", "PostgreSQL"],
-      link: "#"
-    },
-    {
-      title: "Content Generation Engine",
-      description: "Automated marketing copy generator that adapts tone and style based on brand guidelines.",
-      tech: ["LangChain", "Node.js", "Redis", "Tailwind"],
-      link: "#"
-    }
-  ];
+        // --- Components ---
 
-  const scrollTo = (id) => {
-    setIsMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+        const SectionHeading = ({ number, title }) => (
+            <div className="flex items-center mb-8 w-full">
+                <span className="text-[#64FFDA] font-mono text-xl mr-2">{number}.</span>
+                <h2 className="text-2xl md:text-3xl font-bold text-[#CCD6F6] whitespace-nowrap">
+                    {title}
+                </h2>
+                <div className="h-[1px] bg-[#233554] w-full ml-4 md:w-[300px]"></div>
+            </div>
+        );
 
-  return (
-    <div className="min-h-screen bg-[#0A192F] text-[#8892b0] font-sans selection:bg-[#233554] selection:text-[#64FFDA]">
-      
-      {/* --- Navigation --- */}
-      <nav className="fixed w-full z-50 bg-[#0A192F]/90 backdrop-blur-sm transition-all duration-300 shadow-lg border-b border-[#233554]/30">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <a href="#" className="text-[#64FFDA] font-bold text-2xl font-mono tracking-tighter hover:bg-[#64FFDA]/10 p-2 rounded">
-            Rppy<span className="text-[#CCD6F6]">.ai</span>
-          </a>
+        const Button = ({ children, primary, href, onClick, className = "" }) => {
+            const baseClasses = "px-6 py-3 rounded font-mono text-sm transition-all duration-300 ease-in-out border inline-block text-center cursor-pointer select-none";
+            const primaryClasses = "border-[#64FFDA] text-[#64FFDA] hover:bg-[#64FFDA]/10";
+            const secondaryClasses = "border-transparent text-[#CCD6F6] hover:text-[#64FFDA]";
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link, i) => (
-              <a 
-                key={link.name}
-                href={link.href}
-                onClick={(e) => { e.preventDefault(); scrollTo(link.href.substring(1)); }}
-                className="group text-sm font-mono text-[#CCD6F6] hover:text-[#64FFDA] transition-colors"
-              >
-                <span className="text-[#64FFDA] mr-1">{link.number}.</span>
-                {link.name}
-              </a>
-            ))}
-            <Button href="#contact" primary className="!py-2 !px-4 ml-2">
-              Let's Talk
-            </Button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-[#64FFDA]"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
-          </button>
-        </div>
-
-        {/* Mobile Nav Overlay */}
-        {isMenuOpen && (
-          <div className="md:hidden absolute top-20 left-0 w-full bg-[#112240] border-b border-[#233554] shadow-2xl">
-            <div className="flex flex-col p-6 gap-6 items-center">
-              {navLinks.map((link) => (
-                <a 
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => { e.preventDefault(); scrollTo(link.href.substring(1)); }}
-                  className="text-lg font-mono text-[#CCD6F6] hover:text-[#64FFDA]"
+            const Component = href ? 'a' : 'button';
+            
+            return (
+                <Component 
+                    href={href} 
+                    onClick={onClick}
+                    className={`${baseClasses} ${primary ? primaryClasses : secondaryClasses} ${className}`}
                 >
-                  <span className="text-[#64FFDA] block text-center text-sm mb-1">{link.number}.</span>
-                  {link.name}
-                </a>
-              ))}
-              <Button href="#contact" primary onClick={() => setIsMenuOpen(false)}>
-                Hire Me
-              </Button>
-            </div>
-          </div>
-        )}
-      </nav>
+                    {children}
+                </Component>
+            );
+        };
 
-      {/* --- Main Content --- */}
-      <main className="max-w-[1000px] mx-auto px-6 md:px-10 lg:px-12 pt-24">
-        
-        {/* --- Hero Section --- */}
-        <section id="hero" className="min-h-screen flex flex-col justify-center items-start">
-          <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <p className="font-mono text-[#64FFDA] mb-5 text-lg">Hi, I'm</p>
-            <h1 className="text-5xl md:text-7xl font-bold text-[#CCD6F6] mb-4 tracking-tight">
-              Rppy.
-            </h1>
-            <h2 className="text-4xl md:text-6xl font-bold text-[#8892b0] mb-8 leading-tight">
-              Accelerating Business <br /> with AI Solutions.
-            </h2>
-            <p className="max-w-[540px] text-lg text-[#8892b0] mb-12 leading-relaxed">
-              I bridge the gap between complex AI technology and practical business results. 
-              Specializing in building intelligent automated systems and high-performance applications.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button href="#work" primary onClick={(e) => { e.preventDefault(); scrollTo('work'); }}>
-                Check out my work
-              </Button>
-              <Button href="#contact" onClick={(e) => { e.preventDefault(); scrollTo('contact'); }}>
-                Contact Me
-              </Button>
-            </div>
-          </div>
-          
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce hidden md:block text-[#64FFDA]">
-            <ChevronDown size={32} />
-          </div>
-        </section>
+        // --- Main App Component ---
 
-        {/* --- About Section --- */}
-        <section id="about" className="py-24">
-          <SectionHeading number="01" title="About Me" />
-          
-          <div className="grid md:grid-cols-3 gap-10">
-            <div className="md:col-span-2 text-lg leading-relaxed">
-              <p className="mb-4">
-                Hello! My name is Rppy and I enjoy creating things that live on the internet, specifically those powered by <span className="text-[#64FFDA]">Artificial Intelligence</span>. My journey started when I automated my first spreadsheet task, and I've been hooked on optimization ever since.
-              </p>
-              <p className="mb-4">
-                Fast-forward to today, I've had the privilege of working with start-ups and established businesses to implement <span className="text-[#64FFDA]">LLMs</span>, <span className="text-[#64FFDA]">automations</span>, and robust web architectures.
-              </p>
-              <p className="mb-6">
-                I don't just write code; I design systems that solve real problems.
-              </p>
+        function App() {
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [activeSection, setActiveSection] = useState('hero');
+            const [isVisible, setIsVisible] = useState(false);
 
-              <p className="font-mono text-sm mb-2 text-[#CCD6F6]">Here are a few technologies I've been working with recently:</p>
-              <ul className="grid grid-cols-2 gap-2 font-mono text-sm">
-                {['Python', 'TensorFlow/PyTorch', 'TypeScript (React)', 'OpenAI API', 'LangChain', 'PostgreSQL'].map(tech => (
-                  <li key={tech} className="flex items-center text-[#8892b0]">
-                    <span className="text-[#64FFDA] mr-2">▹</span> {tech}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            // Fade-in effect on mount
+            useEffect(() => {
+                setIsVisible(true);
+                
+                // Scroll spy for active section
+                const handleScroll = () => {
+                    const sections = ['hero', 'about', 'services', 'work', 'contact'];
+                    const scrollPosition = window.scrollY + 100;
 
-            {/* Profile Image Representation */}
-            <div className="relative group mx-auto md:mx-0 max-w-[300px]">
-              <div className="absolute inset-0 border-2 border-[#64FFDA] rounded translate-x-4 translate-y-4 transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
-              <div className="relative bg-[#112240] rounded overflow-hidden aspect-square flex items-center justify-center group-hover:bg-transparent transition-colors duration-300">
-                <div className="absolute inset-0 bg-[#64FFDA]/20 group-hover:bg-transparent transition-colors z-10"></div>
-                {/* Abstract Tech Icon/Avatar Placeholder */}
-                <div className="text-[#CCD6F6] text-9xl select-none font-bold opacity-20">AI</div>
-                <Cpu size={80} className="text-[#64FFDA] relative z-0" strokeWidth={1} />
-              </div>
-            </div>
-          </div>
-        </section>
+                    for (const section of sections) {
+                        const element = document.getElementById(section);
+                        if (element && element.offsetTop <= scrollPosition && (element.offsetTop + element.offsetHeight) > scrollPosition) {
+                            setActiveSection(section);
+                        }
+                    }
+                };
 
-        {/* --- Services Section --- */}
-        <section id="services" className="py-24">
-          <SectionHeading number="02" title="What I Do" />
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {services.map((service, index) => (
-              <div 
-                key={index} 
-                className="bg-[#112240] p-8 rounded shadow-xl hover:-translate-y-2 transition-transform duration-300 cursor-default group"
-              >
-                <div className="text-[#64FFDA] mb-6 group-hover:scale-110 transition-transform duration-300">
-                  {service.icon}
-                </div>
-                <h3 className="text-[#CCD6F6] text-xl font-bold mb-4">{service.title}</h3>
-                <p className="text-[#8892b0] text-sm leading-relaxed">
-                  {service.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
 
-        {/* --- Work/Portfolio Section --- */}
-        <section id="work" className="py-24">
-          <SectionHeading number="03" title="Selected Projects" />
-          
-          <div className="grid grid-cols-1 gap-12">
-            {projects.map((project, index) => (
-              <div key={index} className="relative group bg-[#112240] md:bg-transparent rounded-lg p-6 md:p-0">
-                {/* Desktop Layout: Alternating Grid */}
-                <div className={`hidden md:flex items-center ${index % 2 === 1 ? 'flex-row-reverse' : ''}`}>
-                  
-                  {/* Mock Image Area */}
-                  <div className="w-7/12 relative h-[300px] bg-[#233554] rounded bg-opacity-50 border border-[#233554] overflow-hidden group-hover:border-[#64FFDA]/50 transition-colors">
-                     <div className="absolute inset-0 bg-[#0A192F]/40 hover:bg-transparent transition-colors duration-300 flex items-center justify-center">
-                        <span className="font-mono text-4xl text-[#64FFDA] opacity-20 font-bold">PROJECT SHOT</span>
-                     </div>
-                  </div>
+            const navLinks = [
+                { name: 'About', href: '#about', number: '01' },
+                { name: 'Services', href: '#services', number: '02' },
+                { name: 'Work', href: '#work', number: '03' },
+                { name: 'Contact', href: '#contact', number: '04' },
+            ];
 
-                  {/* Content Area */}
-                  <div className={`w-5/12 z-10 flex flex-col ${index % 2 === 1 ? 'items-start text-left' : 'items-end text-right'} -ml-16 ${index % 2 === 1 ? 'ml-0 -mr-16' : ''}`}>
-                    <p className="font-mono text-[#64FFDA] text-sm mb-2">Featured Project</p>
-                    <h3 className="text-[#CCD6F6] text-2xl font-bold mb-4 hover:text-[#64FFDA] transition-colors cursor-pointer">
-                      {project.title}
-                    </h3>
-                    
-                    <div className="bg-[#112240] p-6 rounded shadow-xl mb-4 text-[#8892b0] text-sm leading-relaxed hover:shadow-2xl transition-shadow">
-                      {project.description}
+            const services = [
+                {
+                    title: "AI Implementation",
+                    icon: <Brain size={32} />,
+                    description: "Integrating State-of-the-Art LLMs and machine learning models into existing business applications to enhance intelligence and capability."
+                },
+                {
+                    title: "Workflow Automation",
+                    icon: <Zap size={32} />,
+                    description: "Streamlining repetitive business processes using Python scripts, n8n, or custom API integrations to save time and reduce error."
+                },
+                {
+                    title: "Technical Consulting",
+                    icon: <Code2 size={32} />,
+                    description: "Helping stakeholders navigate the AI landscape, selecting the right tech stack, and architecting scalable solutions."
+                }
+            ];
+
+            const projects = [
+                {
+                    title: "Customer Support AI Agent",
+                    description: "A context-aware chatbot capable of handling 80% of level-1 support queries. Integrated with Zendesk and trained on company documentation.",
+                    tech: ["OpenAI API", "Python", "Vector DB", "React"],
+                    link: "#"
+                },
+                {
+                    title: "Predictive Sales Dashboard",
+                    description: "A real-time dashboard visualizing sales trends and forecasting future revenue using historical data models.",
+                    tech: ["TensorFlow", "Next.js", "D3.js", "PostgreSQL"],
+                    link: "#"
+                },
+                {
+                    title: "Content Generation Engine",
+                    description: "Automated marketing copy generator that adapts tone and style based on brand guidelines.",
+                    tech: ["LangChain", "Node.js", "Redis", "Tailwind"],
+                    link: "#"
+                }
+            ];
+
+            const scrollTo = (id) => {
+                setIsMenuOpen(false);
+                const element = document.getElementById(id);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            return (
+                <div className="min-h-screen">
+                
+                {/* --- Navigation --- */}
+                <nav className="fixed w-full z-50 bg-[#0A192F]/90 backdrop-blur-sm transition-all duration-300 shadow-lg border-b border-[#233554]/30">
+                    <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                    <a href="#" className="text-[#64FFDA] font-bold text-2xl font-mono tracking-tighter hover:bg-[#64FFDA]/10 p-2 rounded no-underline">
+                        Rppy<span className="text-[#CCD6F6]">.ai</span>
+                    </a>
+
+                    {/* Desktop Nav */}
+                    <div className="hidden md:flex items-center gap-8">
+                        {navLinks.map((link, i) => (
+                        <a 
+                            key={link.name}
+                            href={link.href}
+                            onClick={(e) => { e.preventDefault(); scrollTo(link.href.substring(1)); }}
+                            className="group text-sm font-mono text-[#CCD6F6] hover:text-[#64FFDA] transition-colors no-underline"
+                        >
+                            <span className="text-[#64FFDA] mr-1">{link.number}.</span>
+                            {link.name}
+                        </a>
+                        ))}
+                        <Button href="#contact" primary className="!py-2 !px-4 ml-2">
+                        Let's Talk
+                        </Button>
                     </div>
 
-                    <ul className={`flex flex-wrap gap-4 text-xs font-mono text-[#a8b2d1] mb-6 ${index % 2 === 1 ? 'justify-start' : 'justify-end'}`}>
-                      {project.tech.map(t => <li key={t}>{t}</li>)}
-                    </ul>
-
-                    <div className="flex gap-4 text-[#CCD6F6]">
-                      <a href="#" className="hover:text-[#64FFDA]"><Github size={20} /></a>
-                      <a href="#" className="hover:text-[#64FFDA]"><ExternalLink size={20} /></a>
+                    {/* Mobile Menu Button */}
+                    <button 
+                        className="md:hidden text-[#64FFDA] bg-transparent border-none cursor-pointer"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
+                        {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
+                    </button>
                     </div>
-                  </div>
-                </div>
 
-                {/* Mobile Card Layout */}
-                <div className="md:hidden">
-                    <div className="flex justify-between items-center mb-4">
-                        <div className="font-mono text-[#64FFDA] text-xs">Featured Project</div>
-                        <div className="flex gap-4 text-[#CCD6F6]">
-                            <ExternalLink size={18} />
+                    {/* Mobile Nav Overlay */}
+                    {isMenuOpen && (
+                    <div className="md:hidden absolute top-20 left-0 w-full bg-[#112240] border-b border-[#233554] shadow-2xl">
+                        <div className="flex flex-col p-6 gap-6 items-center">
+                        {navLinks.map((link) => (
+                            <a 
+                            key={link.name}
+                            href={link.href}
+                            onClick={(e) => { e.preventDefault(); scrollTo(link.href.substring(1)); }}
+                            className="text-lg font-mono text-[#CCD6F6] hover:text-[#64FFDA] no-underline"
+                            >
+                            <span className="text-[#64FFDA] block text-center text-sm mb-1">{link.number}.</span>
+                            {link.name}
+                            </a>
+                        ))}
+                        <Button href="#contact" primary onClick={() => setIsMenuOpen(false)}>
+                            Hire Me
+                        </Button>
                         </div>
                     </div>
-                    <h3 className="text-[#CCD6F6] text-xl font-bold mb-2">{project.title}</h3>
-                    <p className="text-[#8892b0] text-sm mb-4">{project.description}</p>
-                    <ul className="flex flex-wrap gap-3 text-xs font-mono text-[#a8b2d1]">
-                      {project.tech.map(t => <li key={t}>{t}</li>)}
-                    </ul>
+                    )}
+                </nav>
+
+                {/* --- Main Content --- */}
+                <main className="max-w-[1000px] mx-auto px-6 md:px-10 lg:px-12 pt-24">
+                    
+                    {/* --- Hero Section --- */}
+                    <section id="hero" className="min-h-screen flex flex-col justify-center items-start">
+                    <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                        <p className="font-mono text-[#64FFDA] mb-5 text-lg">Hi, I'm</p>
+                        <h1 className="text-5xl md:text-7xl font-bold text-[#CCD6F6] mb-4 tracking-tight">
+                        Rppy.
+                        </h1>
+                        <h2 className="text-4xl md:text-6xl font-bold text-[#8892b0] mb-8 leading-tight">
+                        Accelerating Business <br /> with AI Solutions.
+                        </h2>
+                        <p className="max-w-[540px] text-lg text-[#8892b0] mb-12 leading-relaxed">
+                        I bridge the gap between complex AI technology and practical business results. 
+                        Specializing in building intelligent automated systems and high-performance applications.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                        <Button href="#work" primary onClick={(e) => { e.preventDefault(); scrollTo('work'); }}>
+                            Check out my work
+                        </Button>
+                        <Button href="#contact" onClick={(e) => { e.preventDefault(); scrollTo('contact'); }}>
+                            Contact Me
+                        </Button>
+                        </div>
+                    </div>
+                    
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce hidden md:block text-[#64FFDA]">
+                        <ChevronDown size={32} />
+                    </div>
+                    </section>
+
+                    {/* --- About Section --- */}
+                    <section id="about" className="py-24">
+                    <SectionHeading number="01" title="About Me" />
+                    
+                    <div className="grid md:grid-cols-3 gap-10">
+                        <div className="md:col-span-2 text-lg leading-relaxed">
+                        <p className="mb-4">
+                            Hello! My name is Rppy and I enjoy creating things that live on the internet, specifically those powered by <span className="text-[#64FFDA]">Artificial Intelligence</span>. My journey started when I automated my first spreadsheet task, and I've been hooked on optimization ever since.
+                        </p>
+                        <p className="mb-4">
+                            Fast-forward to today, I've had the privilege of working with start-ups and established businesses to implement <span className="text-[#64FFDA]">LLMs</span>, <span className="text-[#64FFDA]">automations</span>, and robust web architectures.
+                        </p>
+                        <p className="mb-6">
+                            I don't just write code; I design systems that solve real problems.
+                        </p>
+
+                        <p className="font-mono text-sm mb-2 text-[#CCD6F6]">Here are a few technologies I've been working with recently:</p>
+                        <ul className="grid grid-cols-2 gap-2 font-mono text-sm list-none pl-0">
+                            {['Python', 'TensorFlow/PyTorch', 'TypeScript (React)', 'OpenAI API', 'LangChain', 'PostgreSQL'].map(tech => (
+                            <li key={tech} className="flex items-center text-[#8892b0]">
+                                <span className="text-[#64FFDA] mr-2">▹</span> {tech}
+                            </li>
+                            ))}
+                        </ul>
+                        </div>
+
+                        {/* Profile Image Representation */}
+                        <div className="relative group mx-auto md:mx-0 max-w-[300px]">
+                        <div className="absolute inset-0 border-2 border-[#64FFDA] rounded translate-x-4 translate-y-4 transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
+                        <div className="relative bg-[#112240] rounded overflow-hidden aspect-square flex items-center justify-center group-hover:bg-transparent transition-colors duration-300">
+                            <div className="absolute inset-0 bg-[#64FFDA]/20 group-hover:bg-transparent transition-colors z-10"></div>
+                            {/* Abstract Tech Icon/Avatar Placeholder */}
+                            <div className="text-[#CCD6F6] text-9xl select-none font-bold opacity-20">AI</div>
+                            <Cpu size={80} className="text-[#64FFDA] relative z-0" strokeWidth={1} />
+                        </div>
+                        </div>
+                    </div>
+                    </section>
+
+                    {/* --- Services Section --- */}
+                    <section id="services" className="py-24">
+                    <SectionHeading number="02" title="What I Do" />
+                    
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {services.map((service, index) => (
+                        <div 
+                            key={index} 
+                            className="bg-[#112240] p-8 rounded shadow-xl hover:-translate-y-2 transition-transform duration-300 cursor-default group"
+                        >
+                            <div className="text-[#64FFDA] mb-6 group-hover:scale-110 transition-transform duration-300">
+                            {service.icon}
+                            </div>
+                            <h3 className="text-[#CCD6F6] text-xl font-bold mb-4">{service.title}</h3>
+                            <p className="text-[#8892b0] text-sm leading-relaxed">
+                            {service.description}
+                            </p>
+                        </div>
+                        ))}
+                    </div>
+                    </section>
+
+                    {/* --- Work/Portfolio Section --- */}
+                    <section id="work" className="py-24">
+                    <SectionHeading number="03" title="Selected Projects" />
+                    
+                    <div className="grid grid-cols-1 gap-12">
+                        {projects.map((project, index) => (
+                        <div key={index} className="relative group bg-[#112240] md:bg-transparent rounded-lg p-6 md:p-0">
+                            {/* Desktop Layout: Alternating Grid */}
+                            <div className={`hidden md:flex items-center ${index % 2 === 1 ? 'flex-row-reverse' : ''}`}>
+                            
+                            {/* Mock Image Area */}
+                            <div className="w-7/12 relative h-[300px] bg-[#233554] rounded bg-opacity-50 border border-[#233554] overflow-hidden group-hover:border-[#64FFDA]/50 transition-colors">
+                                <div className="absolute inset-0 bg-[#0A192F]/40 hover:bg-transparent transition-colors duration-300 flex items-center justify-center">
+                                    <span className="font-mono text-4xl text-[#64FFDA] opacity-20 font-bold">PROJECT SHOT</span>
+                                </div>
+                            </div>
+
+                            {/* Content Area */}
+                            <div className={`w-5/12 z-10 flex flex-col ${index % 2 === 1 ? 'items-start text-left' : 'items-end text-right'} -ml-16 ${index % 2 === 1 ? 'ml-0 -mr-16' : ''}`}>
+                                <p className="font-mono text-[#64FFDA] text-sm mb-2">Featured Project</p>
+                                <h3 className="text-[#CCD6F6] text-2xl font-bold mb-4 hover:text-[#64FFDA] transition-colors cursor-pointer">
+                                {project.title}
+                                </h3>
+                                
+                                <div className="bg-[#112240] p-6 rounded shadow-xl mb-4 text-[#8892b0] text-sm leading-relaxed hover:shadow-2xl transition-shadow">
+                                {project.description}
+                                </div>
+
+                                <ul className={`flex flex-wrap gap-4 text-xs font-mono text-[#a8b2d1] mb-6 list-none pl-0 ${index % 2 === 1 ? 'justify-start' : 'justify-end'}`}>
+                                {project.tech.map(t => <li key={t}>{t}</li>)}
+                                </ul>
+
+                                <div className="flex gap-4 text-[#CCD6F6]">
+                                <a href="#" className="hover:text-[#64FFDA]"><Github size={20} /></a>
+                                <a href="#" className="hover:text-[#64FFDA]"><ExternalLink size={20} /></a>
+                                </div>
+                            </div>
+                            </div>
+
+                            {/* Mobile Card Layout */}
+                            <div className="md:hidden">
+                                <div className="flex justify-between items-center mb-4">
+                                    <div className="font-mono text-[#64FFDA] text-xs">Featured Project</div>
+                                    <div className="flex gap-4 text-[#CCD6F6]">
+                                        <ExternalLink size={18} />
+                                    </div>
+                                </div>
+                                <h3 className="text-[#CCD6F6] text-xl font-bold mb-2">{project.title}</h3>
+                                <p className="text-[#8892b0] text-sm mb-4">{project.description}</p>
+                                <ul className="flex flex-wrap gap-3 text-xs font-mono text-[#a8b2d1] list-none pl-0">
+                                {project.tech.map(t => <li key={t}>{t}</li>)}
+                                </ul>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                    
+                    <div className="mt-20 text-center">
+                        <Button href="#" className="py-4">View Full Project Archive</Button>
+                    </div>
+                    </section>
+
+                    {/* --- Contact Section --- */}
+                    <section id="contact" className="py-24 mb-20 text-center max-w-[600px] mx-auto">
+                    <p className="text-[#64FFDA] font-mono mb-4">04. What's Next?</p>
+                    <h2 className="text-4xl md:text-5xl font-bold text-[#CCD6F6] mb-6">Get In Touch</h2>
+                    <p className="text-[#8892b0] text-lg mb-12">
+                        My inbox is always open. Whether you have a question about AI implementation, want to start a new project, or just want to say hi, I'll try my best to get back to you!
+                    </p>
+                    
+                    <Button href="mailto:hello@rppy.ai" primary className="!px-8 !py-4 text-lg">
+                        Say Hello
+                    </Button>
+
+                    <div className="mt-16 flex justify-center gap-8 md:hidden">
+                        <a href="#" className="text-[#8892b0] hover:text-[#64FFDA]"><Github size={20} /></a>
+                        <a href="#" className="text-[#8892b0] hover:text-[#64FFDA]"><Linkedin size={20} /></a>
+                        <a href="#" className="text-[#8892b0] hover:text-[#64FFDA]"><Twitter size={20} /></a>
+                    </div>
+                    </section>
+
+                </main>
+
+                {/* --- Footer --- */}
+                <footer className="text-center py-6 bg-[#020c1b] text-[#8892b0] text-xs font-mono">
+                    <div className="flex justify-center gap-6 mb-4 md:hidden">
+                    </div>
+                    <p className="hover:text-[#64FFDA] transition-colors cursor-pointer">
+                    Designed & Built by Rppy
+                    </p>
+                    <p className="mt-2">© 2026 Rppy Solutions</p>
+                </footer>
+
+                {/* --- Fixed Sidebars (Desktop Only) --- */}
+                <div className="hidden md:block fixed bottom-0 left-6 lg:left-12 w-10">
+                    <div className="flex flex-col items-center gap-6 text-[#a8b2d1] after:content-[''] after:block after:w-[1px] after:h-24 after:bg-[#a8b2d1] after:mx-auto after:mt-6">
+                    <a href="#" className="hover:text-[#64FFDA] hover:-translate-y-1 transition-all"><Github size={20} /></a>
+                    <a href="#" className="hover:text-[#64FFDA] hover:-translate-y-1 transition-all"><Linkedin size={20} /></a>
+                    <a href="#" className="hover:text-[#64FFDA] hover:-translate-y-1 transition-all"><Twitter size={20} /></a>
+                    </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-20 text-center">
-             <Button href="#" className="py-4">View Full Project Archive</Button>
-          </div>
-        </section>
 
-        {/* --- Contact Section --- */}
-        <section id="contact" className="py-24 mb-20 text-center max-w-[600px] mx-auto">
-          <p className="text-[#64FFDA] font-mono mb-4">04. What's Next?</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#CCD6F6] mb-6">Get In Touch</h2>
-          <p className="text-[#8892b0] text-lg mb-12">
-            My inbox is always open. Whether you have a question about AI implementation, want to start a new project, or just want to say hi, I'll try my best to get back to you!
-          </p>
-          
-          <Button href="mailto:hello@rppy.ai" primary className="!px-8 !py-4 text-lg">
-            Say Hello
-          </Button>
+                <div className="hidden md:block fixed bottom-0 right-6 lg:right-12 w-10">
+                    <div className="flex flex-col items-center gap-6 text-[#a8b2d1] after:content-[''] after:block after:w-[1px] after:h-24 after:bg-[#a8b2d1] after:mx-auto after:mt-6">
+                    <a href="mailto:hello@rppy.ai" className="writing-vertical hover:text-[#64FFDA] hover:-translate-y-1 transition-all font-mono text-xs tracking-widest my-4 no-underline text-[#a8b2d1]">
+                        hello@rppy.ai
+                    </a>
+                    </div>
+                </div>
 
-          <div className="mt-16 flex justify-center gap-8 md:hidden">
-            {/* Socials visible only on mobile here, otherwise in sidebar/footer */}
-            <a href="#" className="text-[#8892b0] hover:text-[#64FFDA]"><Github size={20} /></a>
-            <a href="#" className="text-[#8892b0] hover:text-[#64FFDA]"><Linkedin size={20} /></a>
-            <a href="#" className="text-[#8892b0] hover:text-[#64FFDA]"><Twitter size={20} /></a>
-          </div>
-        </section>
-
-      </main>
-
-      {/* --- Footer --- */}
-      <footer className="text-center py-6 bg-[#020c1b] text-[#8892b0] text-xs font-mono">
-        <div className="flex justify-center gap-6 mb-4 md:hidden">
-             {/* Redundant on mobile, kept for spacing consistency if needed */}
-        </div>
-        <p className="hover:text-[#64FFDA] transition-colors cursor-pointer">
-          Designed & Built by Rppy
-        </p>
-        <p className="mt-2">© 2026 Rppy Solutions</p>
-      </footer>
-
-      {/* --- Fixed Sidebars (Desktop Only) --- */}
-      <div className="hidden md:block fixed bottom-0 left-6 lg:left-12 w-10">
-        <div className="flex flex-col items-center gap-6 text-[#a8b2d1] after:content-[''] after:block after:w-[1px] after:h-24 after:bg-[#a8b2d1] after:mx-auto after:mt-6">
-          <a href="#" className="hover:text-[#64FFDA] hover:-translate-y-1 transition-all"><Github size={20} /></a>
-          <a href="#" className="hover:text-[#64FFDA] hover:-translate-y-1 transition-all"><Linkedin size={20} /></a>
-          <a href="#" className="hover:text-[#64FFDA] hover:-translate-y-1 transition-all"><Twitter size={20} /></a>
-        </div>
-      </div>
-
-      <div className="hidden md:block fixed bottom-0 right-6 lg:right-12 w-10">
-        <div className="flex flex-col items-center gap-6 text-[#a8b2d1] after:content-[''] after:block after:w-[1px] after:h-24 after:bg-[#a8b2d1] after:mx-auto after:mt-6">
-          <a href="mailto:hello@rppy.ai" className="writing-vertical hover:text-[#64FFDA] hover:-translate-y-1 transition-all font-mono text-xs tracking-widest my-4">
-            hello@rppy.ai
-          </a>
-        </div>
-      </div>
-
-      {/* Global CSS for vertical text utility */}
-      <style>{`
-        .writing-vertical {
-          writing-mode: vertical-rl;
+                </div>
+            );
         }
-      `}</style>
-    </div>
-  );
-}
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
